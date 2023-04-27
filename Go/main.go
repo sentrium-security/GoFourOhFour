@@ -84,8 +84,7 @@ var (
 )
 
 func main() {
-	// Parse the flog options, get IP address and set the last request to now
-	flag.Parse()
+	// Get IP and LastRequest time
 	ipadd := getIP()
 	lastRequest = time.Now()
 
@@ -153,7 +152,6 @@ func main() {
 			Addr:    fmt.Sprintf(":%d", *port),
 			Handler: logger(http.DefaultServeMux),
 		}
-
 		fmt.Printf("Starting server on port %d\n\n", *port)
 		go func() {
 			err := srv.ListenAndServe()
@@ -162,7 +160,6 @@ func main() {
 				os.Exit(1)
 			}
 		}()
-
 		// Checks when last request was made to server and will close after inactivity
 		fmt.Printf("Starting Ticker...%s\n", lastRequest.Format(time.UnixDate))
 		ticker := time.NewTicker(time.Minute)
@@ -173,7 +170,6 @@ func main() {
 				os.Exit(0)
 			}
 		}
-
 	}
 }
 
@@ -324,6 +320,8 @@ func logger(handler http.Handler) http.Handler {
 
 // Generate a random password for authentication
 func generatePassword() [2]string {
+	// This function is called first to print the banner, so we need to parse the flags as they're read here.
+	flag.Parse()
 	randomBytes := make([]byte, 20)
 	if _, err := rand.Read(randomBytes); err != nil {
 		panic(err)
