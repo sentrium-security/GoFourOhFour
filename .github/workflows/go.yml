@@ -1,9 +1,8 @@
 name: Go
 
 on:
-  push:
-    tags:
-      - '*'  # This triggers the workflow on any tag push
+  release:
+    types: [created]
 
 jobs:
   build-releases:
@@ -24,29 +23,17 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '1.20'
+        go-version: '1.23'
 
     - name: Build
       run: |
         mkdir -p bin
         go build -o bin/headers_${{ matrix.goos }}_${{ matrix.goarch }} ./
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      with:
-        tag_name: ${{ github.ref_name }}  # Uses the tag that triggered the push
-        release_name: ${{ github.ref_name }}  # Optional: You can customize this
-        body: "Release of version ${{ github.ref_name }}"  # Optional: Customize release notes
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: ./bin/headers_${{ matrix.goos }}_${{ matrix.goarch }}
         asset_name: headers_${{ matrix.goos }}_${{ matrix.goarch }}
         asset_content_type: application/octet-stream
