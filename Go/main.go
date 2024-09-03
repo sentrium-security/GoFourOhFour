@@ -25,56 +25,6 @@ var (
 	ssl      = flag.Bool("ssl", false, "Enable SSL. Requires \"go.crt\" and \"go.key\" files")
 )
 
-// Create HTML for templates
-const homeHtml = `<html>
-	<head>
-		<title>Home</title>
-	</head>
-	<body>
-	<h2>Simple Go Webserver</h2>
-	<a href="/files">Download</a><br>
-	<a href="/upload">Upload</a>
-	</body>
-</html>`
-
-const uploadHtml = `<html>
-	<head>
-		<title>Upload file</title>
-	</head>
-	<body>
-	<h2>Upload File</h2>
-	<form enctype="multipart/form-data" action="{{.Proto}}://{{.IpAddr}}:{{.Port}}/upload" method="post">
-		<input type="file" name="file" />
-		<input type="submit" value="upload" />
-	</form>
-	<br>
-	<a href="/">Home</a>
-	</body>
-</html>`
-
-const successHtml = `<html>
-	<head>
-		<title>Success</title>
-	</head>
-	<body>
-	<h2>File uploaded and saved successfully</h2><br>
-	<a href="/files">Download</a><br>
-	<a href="/upload">Upload</a>
-	</body>
-</html>`
-
-const listFilesHtml = `<html>
-	<head>
-		<title>File List</title>
-	</head>
-	<body>
-	<h2>Download File</h2>
-	%s
-	<br>
-	<a href="/">Home</a>
-	</body>
-</html>`
-
 // Generate and store the password for authentication.
 var (
 	creds       = generatePassword()
@@ -83,7 +33,7 @@ var (
 	lastRequest time.Time
 )
 
-func main() {
+func main() {	
 	// Get IP and LastRequest time
 	ipadd := getIP()
 	lastRequest = time.Now()
@@ -173,12 +123,21 @@ func main() {
 	}
 }
 
+// Use this to render the templates
+func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+	// Template files path
+	templates := template.Must(template.ParseGlob(filepath.Join("Go", "templates", "*.html")))
+	err := templates.ExecuteTemplate(w, tmpl+".html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // Home
 func index() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			t := template.Must(template.New("Home").Parse(homeHtml))
-			t.Execute(w, homeHtml)
+			renderTemplate(w, "home", nil)
 			return
 		}
 	})
@@ -193,30 +152,36 @@ func handleListFiles() http.HandlerFunc {
 			return
 		}
 
-		// Generate HTML for file list
-		var html string
-		for _, f := range files {
-			link := fmt.Sprintf("<a href=\"/download/%s\">%s</a>", f, f)
-			html += fmt.Sprintf("%s<br>", link)
+		// Prepare data to pass to the template
+		data := struct {
+			Files []string
+		}{
+			Files: files,
 		}
 
 		// Write HTML response to client
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprintf(w, listFilesHtml, html)
-
+		renderTemplate(w, "listFiles", data)
 	})
 }
 
 // Get the list of files from path
 func getFilesInDir(dir string) ([]string, error) {
 	var files []string
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			files = append(files, info.Name())
+
+	// Read the directory's contents
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			files = append(files, entry.Name())
 		}
-		return nil
-	})
-	return files, err
+	}
+
+	return files, nil
 }
 
 // Return files for download
@@ -248,8 +213,7 @@ func upload(ip net.IP, proto string, port int) http.HandlerFunc {
 		}
 
 		if r.Method == http.MethodGet {
-			t := template.Must(template.New("Upload").Parse(uploadHtml))
-			t.Execute(w, &v)
+			renderTemplate(w, "upload", &v)
 			return
 		}
 		// Parse the file from the request
@@ -276,8 +240,7 @@ func upload(ip net.IP, proto string, port int) http.HandlerFunc {
 			http.Error(w, "Error saving file", http.StatusInternalServerError)
 			return
 		}
-		t := template.Must(template.New("Home").Parse(successHtml))
-		t.Execute(w, successHtml)
+		renderTemplate(w, "success", nil)
 		// fmt.Fprintf(w, "File uploaded and saved successfully")
 	})
 
