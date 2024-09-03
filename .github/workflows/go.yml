@@ -37,3 +37,5 @@ jobs:
         asset_path: ./bin/headers_${{ matrix.goos }}_${{ matrix.goarch }}
         asset_name: headers_${{ matrix.goos }}_${{ matrix.goarch }}
         asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
