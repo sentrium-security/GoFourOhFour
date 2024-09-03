@@ -1,0 +1,105 @@
+/* styles.css */
+
+body {
+    font-family: 'Raleway', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-right: auto;
+    text-decoration: none;
+    color: white;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+a {
+    display: inline-block;
+    text-decoration: none;
+    color: #4CAF50;
+    font-weight: bold;
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #4CAF50;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+a:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* New Styles for File List */
+ul.file-list {
+    list-style: none;
+    padding: 0;
+}
+
+ul.file-list li {
+    margin: 10px 0;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+ul.file-list li a {
+    display: block;
+    padding: 10px;
+    background-color: #e9f5e9;
+    border: 1px solid #4CAF50;
+    border-radius: 5px;
+    text-align: left;
+    text-decoration: none;
+    color: #4CAF50;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+ul.file-list li a:hover {
+    background-color: #4CAF50;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+ul.file-list li:hover {
+    transform: translateY(-2px);
+}
+
+p.no-files {
+    color: #777;
+    font-style: italic;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9em;
+    color: #777;
+    border-top: 1px solid #ddd;
+}

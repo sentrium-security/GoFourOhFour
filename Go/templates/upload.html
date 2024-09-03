@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Go404</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">Go404</a>
+        <h1>Upload File</h1>
+    </header>
+    <div class="container">
+        <h2>Upload File</h2>
+        <form enctype="multipart/form-data" action="{{.Proto}}://{{.IpAddr}}:{{.Port}}/upload" method="post">
+            <input type="file" name="file" />
+            <input type="submit" value="Upload" />
+        </form>
+        <a href="/">Home</a>
+    </div>
+    <footer>
+        &copy; 2024 Simple Go Webserver. <i>Powered by biscuits</i>.
+    </footer>
+</body>
+</html>
