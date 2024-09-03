@@ -38,6 +38,12 @@ func main() {
 	ipadd := getIP()
 	lastRequest = time.Now()
 
+	cwd, _ := os.Getwd()
+    fmt.Println("Current working directory:", cwd)
+
+	// Static CSS
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("Go/static"))))
+
 	// HTTP handlers that can be handled outside of https/http servers
 	http.HandleFunc("/", auth(index()))
 	http.HandleFunc("/files", auth(handleListFiles()))
