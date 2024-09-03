@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: |
         mkdir -p bin
-        CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o bin/headers_${{ matrix.goos }}_${{ matrix.goarch }} ./
+        CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o bin/headers_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' }} ./
 
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
