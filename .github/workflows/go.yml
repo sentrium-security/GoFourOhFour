@@ -28,7 +28,7 @@ jobs:
     - name: Build
       run: |
         mkdir -p bin
-        go build -o bin/headers_${{ matrix.goos }}_${{ matrix.goarch }} ./Go
+        go build -o bin/headers_${{ matrix.goos }}_${{ matrix.goarch }} ./
 
     - name: Create Release
       id: create_release
