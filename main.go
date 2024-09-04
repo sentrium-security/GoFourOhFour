@@ -3,10 +3,12 @@ package main
 import (
 	"crypto/rand"
 	"crypto/tls"
+	"embed"
 	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -16,6 +18,17 @@ import (
 	"text/template"
 	"time"
 )
+
+// Embed the template files
+//go:embed Go/templates/*.html
+var templatesFS embed.FS
+
+// Embed the static files
+//go:embed Go/static/*
+var staticFS embed.FS
+
+// Parse the templates once at the start
+var templates = template.Must(template.ParseFS(templatesFS, "Go/templates/*.html"))
 
 // Create variables that store the switch values from the user
 var (
@@ -41,8 +54,9 @@ func main() {
 	cwd, _ := os.Getwd()
     fmt.Println("Current working directory:", cwd)
 
-	// Static CSS
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("Go/static"))))
+    // Serve static files
+    staticFiles, _ := fs.Sub(staticFS, "static")
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFiles))))
 
 	// HTTP handlers that can be handled outside of https/http servers
 	http.HandleFunc("/", auth(index()))
@@ -131,8 +145,6 @@ func main() {
 
 // Use this to render the templates
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
-	// Template files path
-	templates := template.Must(template.ParseGlob(filepath.Join("Go", "templates", "*.html")))
 	err := templates.ExecuteTemplate(w, tmpl+".html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
