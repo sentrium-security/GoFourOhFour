@@ -55,7 +55,7 @@ func main() {
     fmt.Println("Current working directory:", cwd)
 
     // Serve static files
-    staticFiles, _ := fs.Sub(staticFS, "static")
+    staticFiles, _ := fs.Sub(staticFS, "Go/static")
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFiles))))
 
 	// HTTP handlers that can be handled outside of https/http servers
