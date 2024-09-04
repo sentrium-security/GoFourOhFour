@@ -29,6 +29,8 @@ Simply open a terminal and execute the GoFourOhFour executable. Possible options
 
 ```
  Usage of GoFourOhFour:
+  -auth
+        Only disable on secure networks! (default true)
   -path string
         Path to the folder to serve. Defaults to current directory (default ".")
   -port int
@@ -40,6 +42,10 @@ Simply open a terminal and execute the GoFourOhFour executable. Possible options
 ```
 
 ## Options
+
+### Auth
+
+If you're on a secure network, you can disable auth to access the webserver unauthenticated.
 
 ### Path
 The path is the directory to serve files from. By default it will serve files in the directory the executable is started from, this is also where files will be uploaded. Example of non-default `-path "c:\temp"`
