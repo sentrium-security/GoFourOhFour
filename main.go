@@ -36,6 +36,7 @@ var (
 	path     = flag.String("path", ".", "Path to the folder to serve. Defaults to current directory")
 	port     = flag.Int("port", 8080, "Port to listen on.")
 	ssl      = flag.Bool("ssl", false, "Enable SSL. Requires \"go.crt\" and \"go.key\" files")
+	auth	 = flag.Bool("auth", true, "Only disable on secure networks!")
 )
 
 // Generate and store the password for authentication.
@@ -59,14 +60,16 @@ func main() {
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFiles))))
 
 	// HTTP handlers that can be handled outside of https/http servers
-	http.HandleFunc("/", auth(index()))
-	http.HandleFunc("/files", auth(handleListFiles()))
-	http.HandleFunc("/download/", auth(handleDownload()))
+	http.HandleFunc("/", wrapAuth(index()))
+	http.HandleFunc("/files", wrapAuth(handleListFiles()))
+	http.HandleFunc("/download/", wrapAuth(handleDownload()))
 
 	// If user wants SSL, create TLS config etc.
 	if *ssl {
-		banner(443, ipadd, "https", true)
-		http.HandleFunc("/upload", auth(upload(ipadd, "https", 443)))
+		if *auth {
+			banner(443, ipadd, "https", true)
+		}		
+		http.HandleFunc("/upload", wrapAuth(upload(ipadd, "https", 443)))
 
 		// Certficate files
 		const (
@@ -114,8 +117,10 @@ func main() {
 		}
 		// Create HTTP server
 	} else {
-		banner(*port, ipadd, "http", false)
-		http.HandleFunc("/upload", auth(upload(ipadd, "http", *port)))
+		if *auth {
+			banner(443, ipadd, "https", true)
+		}	
+		http.HandleFunc("/upload", wrapAuth(upload(ipadd, "http", *port)))
 
 		// Server options
 		srv := &http.Server{
@@ -264,8 +269,16 @@ func upload(ip net.IP, proto string, port int) http.HandlerFunc {
 
 }
 
+// Wrap auth to handle disabling auth
+func wrapAuth(handler http.HandlerFunc) http.HandlerFunc {
+    if *auth {
+        return authHandler(handler)
+    }
+    return handler
+}
+
 // Auth middleware
-func auth(handler http.HandlerFunc) http.HandlerFunc {
+func authHandler(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
 		if !ok || user != *username || pass != password {
