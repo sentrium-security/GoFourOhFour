@@ -96,6 +96,36 @@ p.no-files {
     font-style: italic;
 }
 
+/* Styles for the submitted text list */
+#submitted-text-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.submitted-text {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border: 1px solid #0d47a1;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 1.1em;
+    text-align: left;
+    transition: background-color 0.3s, cursor 0.3s;
+    cursor: pointer;
+}
+
+.submitted-text:hover {
+    background-color: #bbdefb;
+    cursor: pointer;
+}
+
+.no-text {
+    font-style: italic;
+    color: #555;
+}
+
 footer {
     text-align: center;
     padding: 10px;
