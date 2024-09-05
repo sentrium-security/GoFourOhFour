@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Go404</title>
+    <title>Submit Text - Go404</title>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
     <header>
         <a href="/" class="logo">Go404</a>
-        <h1>Success</h1>
+        <h1>Submit Text</h1>
     </header>
     <div class="container">
-        <h2>File Uploaded and Saved Successfully!</h2>
-        <a href="/files">Download Files</a>
-        <a href="/upload">Upload More Files</a>
-        <a href="/retrieve">View text</a>
+        <h2>Enter Your Text</h2>
+        <form action="/submit" method="post" id="textForm">
+            <textarea name="text" rows="4" cols="50" placeholder="Enter your text here..." required></textarea><br>
+            <input type="submit" value="Submit" class="btn">
+        </form>
+        <br>
+        <a href="/">Home</a>
     </div>
     <footer>
         &copy; 2024 Simple Go Webserver. <i>Powered by biscuits</i>.
