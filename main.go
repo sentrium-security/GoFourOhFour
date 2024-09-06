@@ -63,6 +63,7 @@ func main() {
 
 	cwd, _ := os.Getwd()
 	fmt.Println("Current working directory:", cwd)
+	fmt.Printf("IP address: %s \n", ipadd)
 
 	// Serve static files
 	staticFiles, _ := fs.Sub(staticFS, "Go/static")
