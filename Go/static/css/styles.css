@@ -96,6 +96,111 @@ p.no-files {
     font-style: italic;
 }
 
+/* Styles for the submitted text list */
+#submitted-text-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.submitted-text {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border: 1px solid #0d47a1;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 1.1em;
+    text-align: left;
+    transition: background-color 0.3s, cursor 0.3s;
+    cursor: pointer;
+}
+
+.submitted-text:hover {
+    background-color: #bbdefb;
+    cursor: pointer;
+}
+
+.no-text {
+    font-style: italic;
+    color: #555;
+}
+
+/* Grid Layout for the Buttons */
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    justify-items: center;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    background-color: #4CAF50;
+    font-weight: bold;
+    margin: 10px;
+    padding: 15px 30px;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 1.2em;
+    text-transform: uppercase;
+    width: 200px;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #45a049;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    background-color: #39843c;
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Form Submit Button Styling */
+.submit-btn {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s, transform 0.2s ease;
+    width: auto;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+}
+
+/* Hover Effect */
+.submit-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Active Effect (when clicked) */
+.submit-btn:active {
+    background-color: #39843c;
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 footer {
     text-align: center;
     padding: 10px;

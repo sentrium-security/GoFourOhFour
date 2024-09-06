@@ -15,15 +15,18 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
 	"text/template"
 	"time"
 )
 
 // Embed the template files
+//
 //go:embed Go/templates/*.html
 var templatesFS embed.FS
 
 // Embed the static files
+//
 //go:embed Go/static/*
 var staticFS embed.FS
 
@@ -36,7 +39,7 @@ var (
 	path     = flag.String("path", ".", "Path to the folder to serve. Defaults to current directory")
 	port     = flag.Int("port", 8080, "Port to listen on.")
 	ssl      = flag.Bool("ssl", false, "Enable SSL. Requires \"go.crt\" and \"go.key\" files")
-	auth	 = flag.Bool("auth", true, "Only disable on secure networks!")
+	auth     = flag.Bool("auth", true, "Only disable on secure networks!")
 )
 
 // Generate and store the password for authentication.
@@ -47,28 +50,37 @@ var (
 	lastRequest time.Time
 )
 
-func main() {	
+// Store for basic text
+var (
+	textData []string   // Slice to store the posted text data
+	mutex    sync.Mutex // Mutex to handle concurrent access
+)
+
+func main() {
 	// Get IP and LastRequest time
 	ipadd := getIP()
 	lastRequest = time.Now()
 
 	cwd, _ := os.Getwd()
-    fmt.Println("Current working directory:", cwd)
+	fmt.Println("Current working directory:", cwd)
+	fmt.Printf("IP address: %s \n", ipadd)
 
-    // Serve static files
-    staticFiles, _ := fs.Sub(staticFS, "Go/static")
-    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFiles))))
+	// Serve static files
+	staticFiles, _ := fs.Sub(staticFS, "Go/static")
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFiles))))
 
 	// HTTP handlers that can be handled outside of https/http servers
 	http.HandleFunc("/", wrapAuth(index()))
 	http.HandleFunc("/files", wrapAuth(handleListFiles()))
 	http.HandleFunc("/download/", wrapAuth(handleDownload()))
+	http.HandleFunc("/submit", wrapAuth(submit()))
+	http.HandleFunc("/retrieve", wrapAuth(retrieve()))
 
 	// If user wants SSL, create TLS config etc.
 	if *ssl {
 		if *auth {
 			banner(443, ipadd, "https", true)
-		}		
+		}
 		http.HandleFunc("/upload", wrapAuth(upload(ipadd, "https", 443)))
 
 		// Certficate files
@@ -119,7 +131,7 @@ func main() {
 	} else {
 		if *auth {
 			banner(443, ipadd, "https", true)
-		}	
+		}
 		http.HandleFunc("/upload", wrapAuth(upload(ipadd, "http", *port)))
 
 		// Server options
@@ -163,6 +175,67 @@ func index() http.HandlerFunc {
 			renderTemplate(w, "home", nil)
 			return
 		}
+	})
+}
+
+// Submit handles GET and POST requests for submitting text
+func submit() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			// Render the form for submitting text
+			renderTemplate(w, "submit", nil)
+			return
+		}
+
+		if r.Method == http.MethodPost {
+			// Parse the form data
+			if err := r.ParseForm(); err != nil {
+				http.Error(w, "Unable to parse form", http.StatusBadRequest)
+				return
+			}
+
+			// Get the submitted text
+			submittedText := r.FormValue("text")
+			if submittedText == "" {
+				http.Error(w, "No text provided", http.StatusBadRequest)
+				return
+			}
+
+			// Store the submitted text in the slice safely using mutex
+			mutex.Lock()
+			textData = append(textData, submittedText)
+			mutex.Unlock()
+
+			// Optionally, you can render a success template or redirect the user
+			renderTemplate(w, "success", nil) // Send user to retrieve
+			return
+		}
+
+		// If the method is neither GET nor POST, return a method not allowed response
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+}
+
+// Retrieve handles GET requests to display the submitted text
+func retrieve() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			// Lock the mutex to safely read the text data
+			mutex.Lock()
+			data := struct {
+				TextData []string
+			}{
+				TextData: textData,
+			}
+			mutex.Unlock()
+
+			// Render the template to display the submitted text
+			renderTemplate(w, "retrieve", data)
+			return
+		}
+
+		// If the method is not GET, return a method not allowed response
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 }
 
@@ -271,10 +344,10 @@ func upload(ip net.IP, proto string, port int) http.HandlerFunc {
 
 // Wrap auth to handle disabling auth
 func wrapAuth(handler http.HandlerFunc) http.HandlerFunc {
-    if *auth {
-        return authHandler(handler)
-    }
-    return handler
+	if *auth {
+		return authHandler(handler)
+	}
+	return handler
 }
 
 // Auth middleware

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrieve Text - Go404</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">Go404</a>
+        <h1>Submitted Texts</h1>
+    </header>
+    <div class="container">
+        <h2>Retrieved Text Data</h2>
+        {{if .TextData}}
+            <ul id="submitted-text-list">
+                {{range .TextData}}
+                    <li class="submitted-text" onclick="copyToClipboard(this)">{{.}}</li>
+                {{end}}
+            </ul>
+        {{else}}
+            <p class="no-text">No text has been submitted yet.</p>
+        {{end}}
+        <br>
+        <a href="/submit">Submit Text</a>
+        <a href="/">Home</a>
+    </div>
+    <footer>
+        &copy; 2024 Simple Go Webserver. <i>Powered by biscuits</i>.
+    </footer>
+
+    <script>
+        function copyToClipboard(element) {
+            const text = element.textContent;
+    
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    alert('Text copied to clipboard: ' + text);
+                }, function(err) {
+                    console.error('Error copying text: ', err);
+                });
+            } else {
+                // Fallback method
+                const tempInput = document.createElement("input");
+                document.body.appendChild(tempInput);
+                tempInput.setAttribute("value", text);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                alert('Text copied to clipboard: ' + text);
+            }
+        }
+    </script>
+</body>
+</html>
