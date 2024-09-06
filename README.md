@@ -8,6 +8,7 @@
 Currently it supports;
 
 - File upload / download with basic web UI
+- Ability to send text to the server to retrieve
 - SSL (see usage)
 - Authentication (see usage)
 
